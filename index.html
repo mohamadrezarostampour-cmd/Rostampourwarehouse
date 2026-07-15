@@ -106,7 +106,10 @@ body{
 .grid-3{grid-template-columns:repeat(3,1fr);}
 .grid-2{grid-template-columns:repeat(2,1fr);}
 @media(max-width:1100px){.grid-4{grid-template-columns:repeat(2,1fr);} .grid-3{grid-template-columns:repeat(2,1fr);}}
-@media(max-width:700px){.grid-4,.grid-3,.grid-2{grid-template-columns:1fr;} .sidebar{position:fixed; right:0; z-index:50; transform:translateX(100%); transition:.2s;} .sidebar.open{transform:translateX(0);} .main{padding:16px;}}
+.mobile-menu-btn{display:none; position:fixed; top:14px; right:14px; z-index:70; width:44px; height:44px; border-radius:10px; background:var(--bg-2); border:1px solid var(--line); color:var(--txt-1); font-size:20px; align-items:center; justify-content:center; cursor:pointer; box-shadow:var(--shadow);}
+.sidebar-overlay{display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:45;}
+.sidebar-overlay.show{display:block;}
+@media(max-width:700px){.grid-4,.grid-3,.grid-2{grid-template-columns:1fr;} .sidebar{position:fixed; right:0; z-index:50; transform:translateX(100%); transition:.2s;} .sidebar.open{transform:translateX(0);} .main{padding:16px; padding-top:70px;} .mobile-menu-btn{display:flex;}}
 
 .stat-card{display:flex; flex-direction:column; gap:8px;}
 .stat-icon{width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:17px;}
@@ -181,14 +184,17 @@ select.filter-select{padding:10px 12px; border-radius:10px; background:var(--bg-
     <div class="field"><label>رمز عبور</label><input type="password" id="loginPass" placeholder="رمز عبور (برای مهمان خالی بگذارید)" autocomplete="off"></div>
     <button class="btn btn-primary" onclick="doLogin()">ورود به سامانه</button>
     <div class="login-err" id="loginErr"></div>
+    <button class="btn btn-ghost" style="width:100%; margin-top:10px;" onclick="loginAsGuest()">👁️ ورود به‌عنوان مهمان (فقط مشاهده)</button>
     <button class="btn btn-ghost btn-sm install-btn" id="installBtnLogin" onclick="installApp()">⬇️ نصب برنامه روی دستگاه</button>
-    <div class="login-hint">دسترسی مشاهده‌گر: هر نام کاربری دیگری بدون نیاز به رمز عبور، صرفاً جهت مشاهده و جستجوی لیست قطعات و موجودی.</div>
+    <div class="login-hint">دسترسی مشاهده‌گر: با دکمه بالا یا با وارد کردن هر نام کاربری دلخواه (بدون رمز عبور)، صرفاً جهت مشاهده و جستجوی لیست قطعات و موجودی.</div>
     <div class="login-footer">طراحی و توسعه‌دهنده: محمدرضا رستم‌پور</div>
   </div>
 </div>
 
 <div id="appScreen">
 <div class="toast-wrap" id="toastWrap"></div>
+<button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleSidebar()">☰</button>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 <div class="app-shell">
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-head">
@@ -452,6 +458,11 @@ function logActivity(action, details){
 function genId(prefix){ return prefix+"_"+Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
 
 /* ---------------- AUTH ---------------- */
+function loginAsGuest(){
+  document.getElementById("loginUser").value="مهمان";
+  document.getElementById("loginPass").value="";
+  doLogin();
+}
 async function doLogin(){
   const u=document.getElementById("loginUser").value.trim();
   const p=document.getElementById("loginPass").value;
@@ -502,11 +513,21 @@ function buildNav(){
     el.className="nav-item"+(STATE.currentPage===n.id?" active":"");
     el.dataset.page=n.id;
     el.innerHTML=`<span class="ic">${n.icon}</span><span>${n.label}</span>`;
-    el.onclick=()=>renderPage(n.id);
+    el.onclick=()=>{ renderPage(n.id); closeSidebar(); };
     nav.appendChild(el);
   });
 }
 function setActiveNav(page){ document.querySelectorAll(".nav-item").forEach(el=>el.classList.toggle("active", el.dataset.page===page)); }
+
+/* ---------------- MOBILE SIDEBAR TOGGLE ---------------- */
+function toggleSidebar(){
+  document.getElementById("sidebar").classList.toggle("open");
+  document.getElementById("sidebarOverlay").classList.toggle("show");
+}
+function closeSidebar(){
+  document.getElementById("sidebar").classList.remove("open");
+  document.getElementById("sidebarOverlay").classList.remove("show");
+}
 
 /* ---------------- ROUTER ---------------- */
 function renderPage(page){
