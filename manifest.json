@@ -1,6 +1,6 @@
 {
-  "name": "سامانه انبارداری قطعات - رستم‌پور",
-  "short_name": "انبار رستم‌پور",
+  "name": "Rostampour Warehouse",
+  "short_name": "Rostampour Warehouse",
   "description": "سامانه انبارداری و مدیریت قطعات صنعتی - ایستگاه توزیع آب پارس",
   "start_url": "./index.html",
   "scope": "./",

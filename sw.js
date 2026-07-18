@@ -1,4 +1,4 @@
-const CACHE_NAME = "rostampour-warehouse-parts-v3";
+const CACHE_NAME = "rostampour-warehouse-parts-v4";
 const APP_SHELL = [
   "./index.html",
   "./manifest.json",
